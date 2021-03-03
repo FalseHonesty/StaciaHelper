@@ -1,0 +1,10 @@
+{
+  "required": true,
+  "package": "dev.falsehonesty.staciahelper.mixins",
+  "compatibilityLevel": "JAVA_8",
+  "refmap": "staciahelper.refmap.json",
+  "mixins": [
+    "MixinCompoundNBT"
+  ],
+  "minVersion": "0.8"
+}
