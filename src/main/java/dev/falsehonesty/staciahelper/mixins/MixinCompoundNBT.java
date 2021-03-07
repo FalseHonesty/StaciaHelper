@@ -9,6 +9,8 @@ import org.spongepowered.asm.mixin.Shadow;
 
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.ConcurrentModificationException;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -25,14 +27,15 @@ public abstract class MixinCompoundNBT {
      */
     @Overwrite
     public void write(DataOutput output) throws IOException {
-        Set<String> keySet = this.tagMap.keySet();
-        String[] strings = keySet.toArray(new String[0]);
-
-        for (String s : strings) {
-            INBT inbt = this.tagMap.get(s);
-            if (inbt == null)
-                continue;
-            writeEntry(s, inbt, output);
+        try {
+            for (String s : this.tagMap.keySet()) {
+                INBT inbt = this.tagMap.get(s);
+                writeEntry(s, inbt, output);
+            }
+        } catch (ConcurrentModificationException e) {
+            // Sometimes the NBT gets changed while we're writing. In this case,
+            // we'll just send whatever data we've written so far and scrap the rest. Perhaps there is a better
+            // alternative (like using a CHM?), but this seems preferred to disconnecting the player.
         }
 
         output.writeByte(0);
